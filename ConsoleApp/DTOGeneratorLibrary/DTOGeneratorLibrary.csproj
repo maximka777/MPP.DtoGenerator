@@ -103,6 +103,7 @@
     <Compile Include="PropertyInfo.cs" />
     <Compile Include="TypeConverter.cs" />
     <Compile Include="TypeInfo.cs" />
+    <Compile Include="TypeService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -1,12 +1,10 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Formatting;
-using System;
+using Microsoft.CodeAnalysis.MSBuild;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ConsoleApp
 {
@@ -30,7 +28,7 @@ namespace ConsoleApp
 
         public string GenerateCodeString(CompilationUnitSyntax syntax)
         {
-            SyntaxNode formattedNode = Formatter.Format(syntax, null);
+            SyntaxNode formattedNode = Formatter.Format(syntax, MSBuildWorkspace.Create());
             StringBuilder sb = new StringBuilder();
             using (StringWriter writer = new StringWriter(sb))
             {

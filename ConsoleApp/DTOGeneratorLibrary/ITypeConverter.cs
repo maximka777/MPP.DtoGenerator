@@ -8,6 +8,6 @@ namespace DTOGeneratorLibrary
 {
     public interface ITypeConverter
     {
-        string tryGetTypeName(TypeInfo typeInfo);
+        string TryGetTypeName(TypeInfo typeInfo);
     }
 }

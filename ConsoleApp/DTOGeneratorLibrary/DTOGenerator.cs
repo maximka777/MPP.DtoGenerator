@@ -22,14 +22,19 @@ namespace DTOGeneratorLibrary
 
         private TypeSyntax GenerateType(string type, string format)
         {
-            return SyntaxFactory.ParseTypeName("System.Integer");
+            string _NetTypeName = TypeService.Instsance.GetType(new TypeInfo(type, format));
+            return SyntaxFactory.ParseTypeName(_NetTypeName);
         }
 
         private PropertyDeclarationSyntax GenerateProperty(PropertyInfo propertyInfo)
         {
             TypeSyntax type = GenerateType(propertyInfo.Type, propertyInfo.Format);
             PropertyDeclarationSyntax property = SyntaxFactory.PropertyDeclaration(type, propertyInfo.Name)
-                .AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword));
+                .AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword))
+                .AddAccessorListAccessors(SyntaxFactory.AccessorDeclaration(SyntaxKind.GetAccessorDeclaration).
+                    WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken)),
+                SyntaxFactory.AccessorDeclaration(SyntaxKind.SetAccessorDeclaration).
+                    WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken)));
             return property;
         }
 

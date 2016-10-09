@@ -19,7 +19,6 @@ namespace ConsoleApp
             Dictionary<string, CompilationUnitSyntax> dict = generator.GenerateAllDTO(classInfoList);
             SyntaxFileWriter writer = new SyntaxFileWriter("generated_classes");
             writer.WriteAllSyntax(dict);
-            Console.Read();
         }
     }
 }
