@@ -12,11 +12,12 @@ namespace DTOGeneratorLibrary
     class TypeService
     {
         private static readonly TypeService service = new TypeService();
-        private static readonly string rootDirectoryName = Path.Combine(Directory.GetCurrentDirectory(), "mods", "types");
+        private static string rootDirectoryName;
         private List<ITypeConverter> foreignTypeConverters = new List<ITypeConverter>();
 
         private TypeService()
         {
+            rootDirectoryName = Path.Combine(Directory.GetCurrentDirectory(), "mods", "types");
             LoadForeignTypeConverters();
         }
 
@@ -80,8 +81,16 @@ namespace DTOGeneratorLibrary
 
         private string TryGetFromForeignTypeConverters(TypeInfo typeInfo)
         {
-
-            return TypeConverter.Instance.TryGetTypeName(typeInfo);
+            string result;
+            foreach(ITypeConverter converter in foreignTypeConverters)
+            {
+                result = converter.TryGetTypeName(typeInfo);
+                if(result != null)
+                {
+                    return result;
+                }
+            }
+            return null;
         } 
     }
 }
