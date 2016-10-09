@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace DTOGeneratorLibrary
 {
-    public class ClassInfo
+    public interface ITypeConverter
     {
-        public string ClassName { get; set; }
-        public List<PropertyInfo> Properties { get; set; }
+        string tryGetTypeName(TypeInfo typeInfo);
     }
 }
