@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -10,12 +11,12 @@ namespace DTOGeneratorLibrary
 {
     public class DTOGenerator
     {
-        public Dictionary<string, CompilationUnitSyntax> GenerateAllDTO(List<ClassInfo> classInfoList)
+        public ConcurrentDictionary<string, CompilationUnitSyntax> GenerateAllDTO(List<ClassInfo> classInfoList)
         {
-            Dictionary<string, CompilationUnitSyntax> result = new Dictionary<string, CompilationUnitSyntax>();
+            ConcurrentDictionary<string, CompilationUnitSyntax> result = new ConcurrentDictionary<string, CompilationUnitSyntax>();
             foreach (ClassInfo classInfo in classInfoList)
             {
-                result.Add(classInfo.ClassName, GenerateDTO(classInfo));
+                result.TryAdd(classInfo.ClassName, GenerateDTO(classInfo));
             }
             return result;
         }
