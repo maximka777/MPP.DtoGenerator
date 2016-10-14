@@ -14,8 +14,8 @@ namespace MultiThreading
         private Queue<I> taskQueue = new Queue<I>();
         private Queue<Thread> freeThreadQueue;
         private List<Thread> busyThreadList = new List<Thread>();
-        public List<O> resultList;
-        public int MaxThreadNumber { get; }
+        public List<O> ResultList { get; private set; }
+        public int MaxThreadNumber { get; private set; }
         private HandleTaskDelegate HandleTask;
 
         public ThreadPool(int maxThreadNumber, HandleTaskDelegate handleTaskDelegate)
@@ -23,7 +23,7 @@ namespace MultiThreading
             MaxThreadNumber = maxThreadNumber;
             HandleTask = handleTaskDelegate;
             freeThreadQueue = new Queue<Thread>(maxThreadNumber);
-            resultList = new List<O>();
+            ResultList = new List<O>();
             InitThreads();
         }
 
@@ -53,8 +53,8 @@ namespace MultiThreading
 
         private void Do(object obj)
         {
-            resultList.Add(HandleTask((I)obj));
-            NotifyTaskIsEndedOrNewTask();
+            ResultList.Add(HandleTask((I)obj));
+            //NotifyTaskIsEndedOrNewTask();
         }
 
         private void NotifyTaskIsEndedOrNewTask()

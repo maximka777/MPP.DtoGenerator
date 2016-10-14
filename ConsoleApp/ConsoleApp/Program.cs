@@ -17,7 +17,7 @@ namespace ConsoleApp
         {
             List<ClassInfo> classInfoList = JsonClassInfoReader.ReadClassInfoFromFile("info.json");
             DTOGenerator generator = new DTOGenerator();
-            ConcurrentDictionary<string, CompilationUnitSyntax> dict = generator.GenerateAllDTO(classInfoList);
+            Dictionary<string, CompilationUnitSyntax> dict = generator.GenerateAllDTO(classInfoList);
             SyntaxFileWriter writer = new SyntaxFileWriter("generated_classes");
             writer.WriteAllSyntax(dict);
         }

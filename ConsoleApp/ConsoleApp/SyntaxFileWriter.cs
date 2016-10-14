@@ -19,9 +19,9 @@ namespace ConsoleApp
             this.directoryName = directoryName;
         }
 
-        public void WriteAllSyntax(ConcurrentDictionary<string, CompilationUnitSyntax> syntaxDictionary)
+        public void WriteAllSyntax(Dictionary<string, CompilationUnitSyntax> syntaxDictionary)
         {
-            foreach(string key in syntaxDictionary.Keys)
+            foreach (string key in syntaxDictionary.Keys)
             {
                 WriteSyntax(key, syntaxDictionary[key]);
             }

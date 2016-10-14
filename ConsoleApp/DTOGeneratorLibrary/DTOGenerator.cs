@@ -1,9 +1,11 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using MultiThreading;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 
@@ -11,14 +13,24 @@ namespace DTOGeneratorLibrary
 {
     public class DTOGenerator
     {
-        public ConcurrentDictionary<string, CompilationUnitSyntax> GenerateAllDTO(List<ClassInfo> classInfoList)
+        public Dictionary<string, CompilationUnitSyntax> GenerateAllDTO(List<ClassInfo> classInfoList)
         {
-            ConcurrentDictionary<string, CompilationUnitSyntax> result = new ConcurrentDictionary<string, CompilationUnitSyntax>();
+            ThreadPool<ClassInfo, CompilationUnitSyntax> threadPool = 
+                new ThreadPool<ClassInfo, CompilationUnitSyntax>(5, GenerateDTO);
             foreach (ClassInfo classInfo in classInfoList)
             {
-                result.TryAdd(classInfo.ClassName, GenerateDTO(classInfo));
+                threadPool.AddTask(classInfo);
             }
-            return result;
+            //while (!threadPool.IsItMade()) { }
+            Thread.Sleep(3000);
+            List<CompilationUnitSyntax> result = threadPool.ResultList;
+            Dictionary<string, CompilationUnitSyntax> resultDict = new Dictionary<string, CompilationUnitSyntax>();
+            int i = 0;
+            foreach(CompilationUnitSyntax syntax in result)
+            {
+                resultDict.Add((i++).ToString(), syntax);
+            }
+            return resultDict;
         }
 
         private TypeSyntax GenerateType(string type, string format)
@@ -56,7 +68,6 @@ namespace DTOGeneratorLibrary
                 .AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword))
                 .AddMembers(GenerateAllProperties(classInfo.Properties));
             return classDeclarationSyntax;
-
         }
 
         public CompilationUnitSyntax GenerateDTO(ClassInfo classInfo)
