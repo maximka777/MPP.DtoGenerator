@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Formatting;
 using Microsoft.CodeAnalysis.MSBuild;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -18,7 +19,7 @@ namespace ConsoleApp
             this.directoryName = directoryName;
         }
 
-        public void WriteAllSyntax(Dictionary<string, CompilationUnitSyntax> syntaxDictionary)
+        public void WriteAllSyntax(ConcurrentDictionary<string, CompilationUnitSyntax> syntaxDictionary)
         {
             foreach(string key in syntaxDictionary.Keys)
             {

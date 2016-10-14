@@ -7,6 +7,7 @@ using System.IO;
 using Newtonsoft.Json;
 using DTOGeneratorLibrary;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Collections.Concurrent;
 
 namespace ConsoleApp
 {
@@ -16,7 +17,7 @@ namespace ConsoleApp
         {
             List<ClassInfo> classInfoList = JsonClassInfoReader.ReadClassInfoFromFile("info.json");
             DTOGenerator generator = new DTOGenerator();
-            Dictionary<string, CompilationUnitSyntax> dict = generator.GenerateAllDTO(classInfoList);
+            ConcurrentDictionary<string, CompilationUnitSyntax> dict = generator.GenerateAllDTO(classInfoList);
             SyntaxFileWriter writer = new SyntaxFileWriter("generated_classes");
             writer.WriteAllSyntax(dict);
         }
