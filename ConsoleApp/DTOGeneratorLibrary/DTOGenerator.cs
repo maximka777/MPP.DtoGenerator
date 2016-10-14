@@ -32,12 +32,16 @@ namespace DTOGeneratorLibrary
             Thread.Sleep(3000);
             List<CompilationUnitSyntax> result = threadPool.ResultList;
             Dictionary<string, CompilationUnitSyntax> resultDict = new Dictionary<string, CompilationUnitSyntax>();
-            int i = 0;
             foreach(CompilationUnitSyntax syntax in result)
             {
-                resultDict.Add((i++).ToString(), syntax);
+                resultDict.Add(GetNameFromCompilationUnitSyntax(syntax), syntax);
             }
             return resultDict;
+        }
+
+        private string GetNameFromCompilationUnitSyntax(CompilationUnitSyntax syntax)
+        {
+            return ((ClassDeclarationSyntax)syntax.Members[0]).Identifier.ToString();
         }
 
         private TypeSyntax GenerateType(string type, string format)
