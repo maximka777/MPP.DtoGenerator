@@ -16,7 +16,14 @@ namespace ConsoleApp
 
         public SyntaxFileWriter(string directoryName)
         {
-            this.directoryName = directoryName;
+            if (Directory.Exists(directoryName))
+            {
+                this.directoryName = directoryName;
+            }
+            else
+            {
+                throw new System.Exception("Directory doesn't exist");
+            }
         }
 
         public void WriteAllSyntax(Dictionary<string, CompilationUnitSyntax> syntaxDictionary)
@@ -40,7 +47,7 @@ namespace ConsoleApp
 
         private string GeneratePathToFile(string name)
         {
-            return Path.Combine(Directory.GetCurrentDirectory(), directoryName, name + fileExtension);
+            return Path.Combine(/*Directory.GetCurrentDirectory(), */directoryName, name + fileExtension);
         }
 
         public void WriteSyntax(string name, CompilationUnitSyntax syntax)

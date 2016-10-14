@@ -13,15 +13,22 @@ namespace DTOGeneratorLibrary
 {
     public class DTOGenerator
     {
-        public Dictionary<string, CompilationUnitSyntax> GenerateAllDTO(List<ClassInfo> classInfoList)
+        private int maxThreadCount;
+
+        public DTOGenerator(int maxThreadCount = 10)
         {
+            this.maxThreadCount = maxThreadCount;
+        }
+
+        public Dictionary<string, CompilationUnitSyntax> GenerateAllDTO(List<ClassInfo> classInfoList)
+        { 
             ThreadPool<ClassInfo, CompilationUnitSyntax> threadPool = 
-                new ThreadPool<ClassInfo, CompilationUnitSyntax>(5, GenerateDTO);
+                new ThreadPool<ClassInfo, CompilationUnitSyntax>(maxThreadCount, GenerateDTO);
             foreach (ClassInfo classInfo in classInfoList)
             {
                 threadPool.AddTask(classInfo);
             }
-            //while (!threadPool.IsItMade()) { }
+            threadPool.Wait();
             Thread.Sleep(3000);
             List<CompilationUnitSyntax> result = threadPool.ResultList;
             Dictionary<string, CompilationUnitSyntax> resultDict = new Dictionary<string, CompilationUnitSyntax>();

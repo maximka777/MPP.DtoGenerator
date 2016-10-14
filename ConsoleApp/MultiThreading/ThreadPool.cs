@@ -33,9 +33,11 @@ namespace MultiThreading
             for(int i = 0; i < MaxThreadNumber; i++)
             {
                 thread = new Thread(new ParameterizedThreadStart(Do));
-                thread.IsBackground = true;
                 freeThreadQueue.Enqueue(thread);
             }
+            Thread checkerThread = new Thread(new ThreadStart(ReturnEndedThreads));
+            checkerThread.IsBackground = true;
+            checkerThread.Start();
         }
 
         public void AddTask(I task)
@@ -54,30 +56,40 @@ namespace MultiThreading
         private void Do(object obj)
         {
             ResultList.Add(HandleTask((I)obj));
-            //NotifyTaskIsEndedOrNewTask();
+        }
+
+        public void Wait()
+        {
+            while(IsItMade() != true) { }
         }
 
         private void NotifyTaskIsEndedOrNewTask()
         {
-            ReturnEndedThreads();
             Thread thread;
             I task;
             while ((freeThreadQueue.Count != 0) && (taskQueue.Count != 0))
             {
                 task = taskQueue.Dequeue();
                 thread = freeThreadQueue.Dequeue();
+                busyThreadList.Add(thread);
                 thread.Start(task);
             }
         }
 
         private void ReturnEndedThreads()
         {
-            for(int i = 0; i < busyThreadList.Count; i++)
+            while (true)
             {
-                if (!busyThreadList[i].IsAlive)
+                if (busyThreadList.Count != 0)
                 {
-                    freeThreadQueue.Enqueue(busyThreadList[i]);
-                    busyThreadList.RemoveAt(i);
+                    for (int i = 0; i < busyThreadList.Count; i++)
+                    {
+                        if (!busyThreadList[i].IsAlive)
+                        {
+                            freeThreadQueue.Enqueue(busyThreadList[i]);
+                            busyThreadList.RemoveAt(i);
+                        }
+                    }
                 }
             }
         }
