@@ -18,7 +18,7 @@ namespace ConsoleApp
 
                 string pathToDir = "generated_classes";
                 string pathToFile = "info.json";
-                int maxThreadCount = 5;
+                int maxThreadCount = 1;
 
                 List<ClassInfo> classInfoList = JsonClassInfoReader.ReadClassInfoFromFile(pathToFile);
                 DTOGenerator generator = new DTOGenerator(maxThreadCount);

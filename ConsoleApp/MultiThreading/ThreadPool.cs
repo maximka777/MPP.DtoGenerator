@@ -10,19 +10,22 @@ namespace MultiThreading
 {
     public class ThreadPool<I, O>
     {
+        private int MAX_TASK_COUNT = 100;
+
         public delegate O HandleTaskDelegate(I input);
         private ConcurrentQueue<I> taskQueue = new ConcurrentQueue<I>();
-        private ConcurrentQueue<Thread> freeThreadQueue;
-        private List<Thread> busyThreadList = new List<Thread>();
+        private List<Thread> threadList;
         public ConcurrentBag<O> ResultList { get; private set; }
         public int MaxThreadNumber { get; private set; }
         private HandleTaskDelegate HandleTask;
+        Semaphore semaphore;
 
         public ThreadPool(int maxThreadNumber, HandleTaskDelegate handleTaskDelegate)
         {
+            semaphore = new Semaphore(0, MAX_TASK_COUNT);
             MaxThreadNumber = maxThreadNumber;
             HandleTask = handleTaskDelegate;
-            freeThreadQueue = new ConcurrentQueue<Thread>();
+            threadList = new List<Thread>();
             ResultList = new ConcurrentBag<O>();
             InitThreads();
         }
@@ -32,13 +35,11 @@ namespace MultiThreading
             Thread thread;
             for(int i = 0; i < MaxThreadNumber; i++)
             {
-                thread = new Thread(new ParameterizedThreadStart(Do));
+                thread = new Thread(new ThreadStart(Do));
                 thread.IsBackground = true;
-                freeThreadQueue.Enqueue(thread);
+                threadList.Add(thread);
+                thread.Start();
             }
-            Thread checkerThread = new Thread(new ThreadStart(ReturnEndedThreads));
-            checkerThread.IsBackground = true;
-            checkerThread.Start();
         }
 
         public void AddTask(I task)
@@ -46,7 +47,8 @@ namespace MultiThreading
             if (task != null)
             {
                 taskQueue.Enqueue(task);
-                NotifyTaskIsEndedOrNewTask();
+                semaphore.Release();
+                
             }
             else
             {
@@ -54,53 +56,36 @@ namespace MultiThreading
             }
         }
 
-        private void Do(object obj)
+        private void Do()
         {
-            ResultList.Add(HandleTask((I)obj));
+            I task;
+            while (true) {
+                semaphore.WaitOne();
+                taskQueue.TryDequeue(out task);
+                ResultList.Add(HandleTask(task));
+            }
         }
 
         public void Wait()
         {
-            while(IsItMade() != true) { }
+            while(!IsItMade()) { }
         }
 
-        private void NotifyTaskIsEndedOrNewTask()
+        private bool AreAllThreadsStoped()
         {
-            Thread thread;
-            I task;
-            while ((freeThreadQueue.Count != 0) && (taskQueue.Count != 0))
+            foreach(Thread thread in threadList)
             {
-                while (!taskQueue.TryDequeue(out task)) { }
-                while (!freeThreadQueue.TryDequeue(out thread)) { }
-                busyThreadList.Add(thread);
-                thread.Start(task);
-            }
-        }
-
-        private void ReturnEndedThreads()
-        {
-            while (true)
-            {
-                if (busyThreadList.Count != 0)
+                if(thread.ThreadState == ThreadState.Running)
                 {
-                    for (int i = 0; i < busyThreadList.Count; i++)
-                    {
-                        if (!busyThreadList[i].IsAlive)
-                        {
-                            freeThreadQueue.Enqueue(busyThreadList[i]);
-                            busyThreadList.RemoveAt(i);
-                            NotifyTaskIsEndedOrNewTask();
-                        }
-                    }
+                    return false;
                 }
-                Thread.Sleep(100);
             }
+            return true;
         }
 
-        public bool IsItMade()
+        private bool IsItMade()
         {
-            return (freeThreadQueue.Count == MaxThreadNumber)
-                && (taskQueue.Count == 0);
+            return ((taskQueue.Count == 0) && (AreAllThreadsStoped()));
         }
     }
 }

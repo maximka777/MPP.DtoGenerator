@@ -31,7 +31,7 @@ namespace DTOGeneratorLibrary
                 threadPool.AddTask(classInfo);
             }
             threadPool.Wait();
-            Thread.Sleep(3000);
+            //Thread.Sleep(10000);
             ConcurrentBag<CompilationUnitSyntax> result = threadPool.ResultList;
             Dictionary<string, CompilationUnitSyntax> resultDict = new Dictionary<string, CompilationUnitSyntax>();
             foreach(CompilationUnitSyntax syntax in result)
