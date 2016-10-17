@@ -14,10 +14,12 @@ namespace DTOGeneratorLibrary
     public class DTOGenerator
     {
         private int maxThreadCount;
+        private TypeService typeService;
 
         public DTOGenerator(int maxThreadCount = 10)
         {
             this.maxThreadCount = maxThreadCount;
+            this.typeService = TypeService.Instance;
         }
 
         public Dictionary<string, CompilationUnitSyntax> GenerateAllDTO(List<ClassInfo> classInfoList)
@@ -46,7 +48,7 @@ namespace DTOGeneratorLibrary
 
         private TypeSyntax GenerateType(string type, string format)
         {
-            string _NetTypeName = TypeService.Instsance.GetType(new TypeInfo(type, format));
+            string _NetTypeName = typeService.GetType(new TypeInfo(type, format));
             return SyntaxFactory.ParseTypeName(_NetTypeName);
         }
 

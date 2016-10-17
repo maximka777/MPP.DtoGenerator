@@ -17,7 +17,7 @@ namespace DTOGeneratorLibrary
             LoadForeignTypeConverters();
         }
 
-        public static TypeService Instsance {
+        public static TypeService Instance {
             get
             {
                 return service;
@@ -59,13 +59,30 @@ namespace DTOGeneratorLibrary
 
         private IEnumerable<ITypeConverter> CheckFileOnImplementationOfITypeConverter(string filename)
         {
-            Assembly assembly = Assembly.LoadFrom(filename);
-            foreach(System.Reflection.TypeInfo type in assembly.DefinedTypes)
+            AssemblyName assemblyName = AssemblyName.GetAssemblyName(filename);
+            Assembly assembly = Assembly.Load(assemblyName);
+            foreach(System.Reflection.TypeInfo type in assembly.GetTypes())
             {
-                if (type.FindInterfaces(ITypeConverterFilter, null).Length != 0)
-                    yield return (ITypeConverter) Activator.CreateInstance(type);
+                if (type.GetInterface(typeof(ITypeConverter).FullName) != null)
+                {
+                    yield return (ITypeConverter)Activator.CreateInstance(type);
+                }
             }
             yield break;
+        }
+
+
+        private bool IsImplementingInterface(Type type, Type interfaceType)
+        {
+            Console.WriteLine(type);
+            foreach(Type implementedInterface in type.GetInterfaces())
+            {
+                if(implementedInterface == interfaceType)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private static bool ITypeConverterFilter(Type type, object criteriaObject)
