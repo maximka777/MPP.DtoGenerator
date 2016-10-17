@@ -32,7 +32,7 @@ namespace DTOGeneratorLibrary
             }
             threadPool.Wait();
             Thread.Sleep(3000);
-            List<CompilationUnitSyntax> result = threadPool.ResultList;
+            ConcurrentBag<CompilationUnitSyntax> result = threadPool.ResultList;
             Dictionary<string, CompilationUnitSyntax> resultDict = new Dictionary<string, CompilationUnitSyntax>();
             foreach(CompilationUnitSyntax syntax in result)
             {

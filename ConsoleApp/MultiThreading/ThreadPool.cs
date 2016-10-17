@@ -11,10 +11,10 @@ namespace MultiThreading
     public class ThreadPool<I, O>
     {
         public delegate O HandleTaskDelegate(I input);
-        private Queue<I> taskQueue = new Queue<I>();
-        private Queue<Thread> freeThreadQueue;
+        private ConcurrentQueue<I> taskQueue = new ConcurrentQueue<I>();
+        private ConcurrentQueue<Thread> freeThreadQueue;
         private List<Thread> busyThreadList = new List<Thread>();
-        public List<O> ResultList { get; private set; }
+        public ConcurrentBag<O> ResultList { get; private set; }
         public int MaxThreadNumber { get; private set; }
         private HandleTaskDelegate HandleTask;
 
@@ -22,8 +22,8 @@ namespace MultiThreading
         {
             MaxThreadNumber = maxThreadNumber;
             HandleTask = handleTaskDelegate;
-            freeThreadQueue = new Queue<Thread>(maxThreadNumber);
-            ResultList = new List<O>();
+            freeThreadQueue = new ConcurrentQueue<Thread>();
+            ResultList = new ConcurrentBag<O>();
             InitThreads();
         }
 
@@ -33,6 +33,7 @@ namespace MultiThreading
             for(int i = 0; i < MaxThreadNumber; i++)
             {
                 thread = new Thread(new ParameterizedThreadStart(Do));
+                thread.IsBackground = true;
                 freeThreadQueue.Enqueue(thread);
             }
             Thread checkerThread = new Thread(new ThreadStart(ReturnEndedThreads));
@@ -69,8 +70,8 @@ namespace MultiThreading
             I task;
             while ((freeThreadQueue.Count != 0) && (taskQueue.Count != 0))
             {
-                task = taskQueue.Dequeue();
-                thread = freeThreadQueue.Dequeue();
+                while (!taskQueue.TryDequeue(out task)) { }
+                while (!freeThreadQueue.TryDequeue(out thread)) { }
                 busyThreadList.Add(thread);
                 thread.Start(task);
             }
@@ -88,9 +89,11 @@ namespace MultiThreading
                         {
                             freeThreadQueue.Enqueue(busyThreadList[i]);
                             busyThreadList.RemoveAt(i);
+                            NotifyTaskIsEndedOrNewTask();
                         }
                     }
                 }
+                Thread.Sleep(100);
             }
         }
 
