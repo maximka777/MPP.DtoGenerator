@@ -47,7 +47,7 @@ namespace ConsoleApp
 
         private string GeneratePathToFile(string name)
         {
-            return Path.Combine(/*Directory.GetCurrentDirectory(), */directoryName, name + fileExtension);
+            return Path.Combine(directoryName, name + fileExtension);
         }
 
         public void WriteSyntax(string name, CompilationUnitSyntax syntax)

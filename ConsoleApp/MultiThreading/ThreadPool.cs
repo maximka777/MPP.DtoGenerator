@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace MultiThreading
 {
-    public class ThreadPool<I, O>
+    public class ThreadPool<I, O> : IDisposable
     {
         private int MAX_TASK_COUNT = 100;
 
@@ -19,6 +16,7 @@ namespace MultiThreading
         public int MaxThreadNumber { get; private set; }
         private HandleTaskDelegate HandleTask;
         Semaphore semaphore;
+        private bool work = true;
 
         public ThreadPool(int maxThreadNumber, HandleTaskDelegate handleTaskDelegate)
         {
@@ -59,7 +57,7 @@ namespace MultiThreading
         private void Do()
         {
             I task;
-            while (true) {
+            while (work) {
                 semaphore.WaitOne();
                 taskQueue.TryDequeue(out task);
                 ResultList.Add(HandleTask(task));
@@ -68,7 +66,10 @@ namespace MultiThreading
 
         public void Wait()
         {
-            while(!IsItMade()) { }
+            while(!IsItMade())
+            {
+                Thread.Sleep(0);
+            }
         }
 
         private bool AreAllThreadsStoped()
@@ -86,6 +87,13 @@ namespace MultiThreading
         private bool IsItMade()
         {
             return ((taskQueue.Count == 0) && (AreAllThreadsStoped()));
+        }
+
+        public void Dispose()
+        {
+            work = false;
+            Thread.Sleep(10);
+            semaphore.Close();
         }
     }
 }

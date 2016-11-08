@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace DTOGeneratorLibrary
 {
-    class TypeService
+    private class TypeService
     {
         private static readonly TypeService service = new TypeService();
         private static string rootDirectoryName;
@@ -37,7 +37,7 @@ namespace DTOGeneratorLibrary
             {
                 return result;
             }
-            return "";
+            return String.Empty;
         }
         
         private string TryGetFromStandardTypeConverter(TypeInfo typeInfo)
@@ -97,7 +97,13 @@ namespace DTOGeneratorLibrary
             string result;
             foreach(ITypeConverter converter in foreignTypeConverters)
             {
-                result = converter.TryGetTypeName(typeInfo);
+                try {
+                    result = converter.TryGetTypeName(typeInfo);
+                }
+                catch(Exception exc)
+                {
+                    result = null;
+                }
                 if(result != null)
                 {
                     return result;

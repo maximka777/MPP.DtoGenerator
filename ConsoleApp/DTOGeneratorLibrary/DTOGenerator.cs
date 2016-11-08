@@ -1,12 +1,8 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
+﻿using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using MultiThreading;
-using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
 
 namespace DTOGeneratorLibrary
@@ -31,7 +27,6 @@ namespace DTOGeneratorLibrary
                 threadPool.AddTask(classInfo);
             }
             threadPool.Wait();
-            //Thread.Sleep(10000);
             ConcurrentBag<CompilationUnitSyntax> result = threadPool.ResultList;
             Dictionary<string, CompilationUnitSyntax> resultDict = new Dictionary<string, CompilationUnitSyntax>();
             foreach(CompilationUnitSyntax syntax in result)

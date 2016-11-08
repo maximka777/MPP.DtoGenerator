@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DTOGeneratorLibrary
 {
-    class TypeConverter : ITypeConverter
+    public class TypeConverter : ITypeConverter
     {
         private static readonly TypeConverter converter = new TypeConverter();
 

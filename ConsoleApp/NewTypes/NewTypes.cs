@@ -11,6 +11,7 @@ namespace NewTypes
     {
         public string TryGetTypeName(TypeInfo typeInfo)
         {
+            throw new InvalidOperationException();
             return "System.Char";
         }
     }

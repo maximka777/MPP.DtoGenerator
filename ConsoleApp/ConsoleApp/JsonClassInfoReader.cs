@@ -13,10 +13,15 @@ namespace ConsoleApp
     {
         public static List<ClassInfo> ReadClassInfoFromFile(string filename)
         {
-            List<ClassInfo> result;
-            JsonReader reader = new JsonTextReader(new StreamReader(filename));
-            JsonSerializer serializer = new JsonSerializer();
-            result = serializer.Deserialize<List<ClassInfo>>(reader);
+            List<ClassInfo> result = new List<ClassInfo>();
+            using (StreamReader streamReader = new StreamReader(filename))
+            {
+                using (JsonReader reader = new JsonTextReader(streamReader))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    result = serializer.Deserialize<List<ClassInfo>>(reader);
+                }
+            }
             return result;
         }
     }
